@@ -8,13 +8,13 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Sequelize with SQLite
+// Initialize Sequelize SQL
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite'
 });
 
-// Define User model
+
 const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING,
@@ -35,14 +35,13 @@ const User = sequelize.define('User', {
     type: DataTypes.DATEONLY
   },
   profilePicture: {
-    type: DataTypes.STRING // URL to the image on Firebase
+    type: DataTypes.STRING 
   }
 });
 
-// Define Follow model for the many-to-many relationship
+
 const Follow = sequelize.define('Follow', {
-  // No need for extra columns here if we just want to track the relationship
-  // Sequelize will automatically create followerId and followingId
+
 });
 
 User.belongsToMany(User, { as: 'Followers', through: Follow, foreignKey: 'followingId', otherKey: 'followerId' });
@@ -57,13 +56,13 @@ app.get('/users', async (req, res) => {
       include: [
         {
           model: User,
-          as: 'Followers', // Users who follow this user
-          attributes: ['id', 'name'], // Only include necessary attributes
-          through: { attributes: [] } // Don't include junction table attributes
+          as: 'Followers', 
+          attributes: ['id', 'name'], 
+          through: { attributes: [] } 
         },
         {
           model: User,
-          as: 'Following', // Users this user follows
+          as: 'Following', 
           attributes: ['id', 'name'],
           through: { attributes: [] }
         }
@@ -143,63 +142,6 @@ app.delete('/users/:id', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Error deleting user', error: error.message });
-  }
-});
-
-// Follow a user
-app.post('/users/follow', async (req, res) => {
-  const { followerId, followingId } = req.body;
-  try {
-    if (followerId === followingId) {
-      return res.status(400).json({ message: 'User cannot follow themselves.' });
-    }
-    const follower = await User.findByPk(followerId);
-    const following = await User.findByPk(followingId);
-
-    if (!follower || !following) {
-      return res.status(404).json({ message: 'Follower or Following user not found.' });
-    }
-
-    // Check if already following
-    const existingFollow = await Follow.findOne({
-        where: { followerId: follower.id, followingId: following.id }
-    });
-    if (existingFollow) {
-        return res.status(400).json({ message: 'Already following this user.'});
-    }
-
-    await follower.addFollowing(following);
-    res.status(200).json({ message: `User ${follower.name} is now following ${following.name}` });
-
-  } catch (error) {
-    res.status(500).json({ message: 'Error following user', error: error.message });
-  }
-});
-
-// Unfollow a user
-app.post('/users/unfollow', async (req, res) => {
-  const { followerId, followingId } = req.body;
-  try {
-    const follower = await User.findByPk(followerId);
-    const following = await User.findByPk(followingId);
-
-    if (!follower || !following) {
-      return res.status(404).json({ message: 'Follower or Following user not found.' });
-    }
-
-    // Check if actually following
-     const existingFollow = await Follow.findOne({
-        where: { followerId: follower.id, followingId: following.id }
-    });
-    if (!existingFollow) {
-        return res.status(400).json({ message: 'Not following this user.'});
-    }
-
-    await follower.removeFollowing(following);
-    res.status(200).json({ message: `User ${follower.name} has unfollowed ${following.name}` });
-
-  } catch (error) {
-    res.status(500).json({ message: 'Error unfollowing user', error: error.message });
   }
 });
 
