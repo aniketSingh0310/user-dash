@@ -1,8 +1,17 @@
-import { Box, Heading, SimpleGrid, Button, Spinner, Text, Flex, Spacer } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import UserProfileCard from '../components/UserProfileCard';
+import {
+  Box,
+  Heading,
+  SimpleGrid,
+  Button,
+  Spinner,
+  Text,
+  Flex,
+  Spacer,
+} from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import UserProfileCard from "../components/UserProfileCard";
 
 function DashboardPage() {
   const [users, setUsers] = useState([]);
@@ -12,10 +21,11 @@ function DashboardPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Assuming your server is running on port 3000 and client on 5173 (default Vite)
-        // You might need to configure proxy in vite.config.js for /api calls
-        const response = await axios.get('http://localhost:3001/api/users');
+        // Assuming your server is running on port 3001 and client on 5173 (default Vite)
+        // Vite proxy in vite.config.js handles forwarding /api calls
+        const response = await axios.get("/api/users");
         setUsers(response.data);
+        console.log(response.data);
       } catch (err) {
         setError(err.message);
         console.error("Error fetching users:", err);
@@ -28,7 +38,15 @@ function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
+    return (
+      <Spinner
+        thickness="4px"
+        speed="0.65s"
+        emptyColor="gray.200"
+        color="blue.500"
+        size="xl"
+      />
+    );
   }
 
   if (error) {
@@ -37,14 +55,8 @@ function DashboardPage() {
 
   return (
     <Box p={5}>
-        <Flex mb={5} alignItems="center">
-            <Heading>User Dashboard</Heading>
-            <Spacer />
-            <Button as={RouterLink} to="/create-user" colorScheme="teal">
-                Create New User
-            </Button>
-        </Flex>
-      
+      <Heading>User Dashboard</Heading>
+
       {users.length === 0 ? (
         <Text>No users found. Click "Create New User" to add some!</Text>
       ) : (
@@ -58,4 +70,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage; 
+export default DashboardPage;
