@@ -21,8 +21,6 @@ function DashboardPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Assuming your server is running on port 3001 and client on 5173 (default Vite)
-        // Vite proxy in vite.config.js handles forwarding /api calls
         const response = await axios.get("/api/users");
         setUsers(response.data);
         console.log(response.data);
@@ -55,16 +53,18 @@ function DashboardPage() {
 
   return (
     <Box p={5}>
-      <Heading>User Dashboard</Heading>
 
-      {users.length === 0 ? (
+   {users.length === 0 ? (
         <Text>No users found. Click "Create New User" to add some!</Text>
       ) : (
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
+        <Box>
+        <Heading pb={5}>User Dashboard</Heading>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={2}>
           {users.map((user) => (
             <UserProfileCard key={user.id || user._id} user={user} />
           ))}
         </SimpleGrid>
+        </Box>
       )}
     </Box>
   );

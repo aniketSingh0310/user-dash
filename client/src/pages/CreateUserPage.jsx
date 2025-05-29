@@ -8,10 +8,13 @@ import {
     VStack,
     useToast,
     FormErrorMessage,
+    Text,
+    Divider
   } from "@chakra-ui/react";
   import { useState } from "react";
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
+  import ImageUpload from "../components/ImageUpload";
   
   function CreateUserPage() {
     const [formData, setFormData] = useState({
@@ -19,7 +22,7 @@ import {
       email: "",
       phone: "",
       dateOfBirth: "",
-      // profilePicture: '' // Will handle file uploads later if needed
+      profilePicture: "" 
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
@@ -29,10 +32,18 @@ import {
     const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData((prev) => ({ ...prev, [name]: value }));
-      // Clear error for this field when user starts typing
+     
       if (errors[name]) {
         setErrors((prev) => ({ ...prev, [name]: null }));
       }
+    };
+  
+    const handleImageUploaded = (imageUrl) => {
+      setFormData((prev) => ({ ...prev, profilePicture: imageUrl }));
+    };
+  
+    const handleImageRemoved = () => {
+      setFormData((prev) => ({ ...prev, profilePicture: "" }));
     };
   
     const validateForm = () => {
@@ -45,7 +56,6 @@ import {
       }
       if (!formData.dateOfBirth)
         newErrors.dateOfBirth = "Date of Birth is required.";
-      // Add more specific validation for phone if needed
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     };
@@ -72,7 +82,7 @@ import {
           duration: 5000,
           isClosable: true,
         });
-        navigate("/"); // Navigate back to dashboard after successful creation
+        navigate("/"); 
       } catch (err) {
         console.error("Error creating user:", err);
         const apiErrorMessage =
@@ -95,7 +105,22 @@ import {
       <Box p={5} maxWidth="600px" margin="auto">
         <Heading mb={5}>Create New User</Heading>
         <form onSubmit={handleSubmit}>
-          <VStack spacing={4} align="stretch">
+          <VStack spacing={6} align="stretch">
+            <Box>
+              <Heading size="md" mb={4}>Profile Picture</Heading>
+              <Box display="flex" justifyContent="center" mb={4}>
+                <ImageUpload
+                  currentImage={formData.profilePicture}
+                  onImageUploaded={handleImageUploaded}
+                  onImageRemoved={handleImageRemoved}
+                />
+              </Box>
+            </Box>
+  
+            <Divider />
+            
+            <Heading size="md">Personal Information</Heading>
+  
             <FormControl isInvalid={!!errors.name} isRequired>
               <FormLabel htmlFor="name">Full Name</FormLabel>
               <Input
@@ -142,8 +167,6 @@ import {
               />
               <FormErrorMessage>{errors.dateOfBirth}</FormErrorMessage>
             </FormControl>
-  
-            {/* TODO: Add profile picture upload (Firebase integration) */}
   
             {errors.form && (
               <Text color="red.500" mt={2}>

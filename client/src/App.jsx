@@ -3,18 +3,17 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
   Link as ChakraLink,
-  Container,
-} from "@chakra-ui/react";
+  } from "@chakra-ui/react";
 import DashboardPage from "./pages/DashboardPage";
 import CreateUserPage from "./pages/CreateUserPage";
 import EditUserPage from "./pages/EditUserPage";
+import { PlusIcon } from "lucide-react";
 
 function Navbar() {
   return (
     <Flex
-      as="nav"
+      
       bg="gray.800"
       p={4}
       color="white"
@@ -32,11 +31,13 @@ function Navbar() {
         User Management
       </ChakraLink>
       <Button
+      size="sm"
         as={RouterLink}
         to="/create-user"
         colorScheme="teal"
-        variant="outline"
+        variant="solid"
         _hover={{ bg: "teal.600", borderColor: "teal.600" }}
+        leftIcon={<PlusIcon/>}
       >
         Create User
       </Button>
